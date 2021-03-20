@@ -42,7 +42,7 @@ app.use(
 app.get('/', (req: express.Request, res: express.Response) => {
   res.status(200).send(`Server running at http://localhost:${port}`);
 });
-server.listen(port, () => {
+export default server.listen(port, () => {
   debugLog(`Server running at http://localhost:${port}`);
   routes.forEach((route: CommonRoutesConfig) => {
     debugLog(`Routes configured for ${route.getName()}`);
