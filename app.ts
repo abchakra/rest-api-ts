@@ -12,6 +12,7 @@ import * as expressWinston from 'express-winston';
 import cors from 'cors';
 import { CommonRoutesConfig } from './common/common.routes.config';
 import { UsersRoutes } from './users/users.routes.config';
+import { AuthRoutes } from './auth/auth.routes.config';
 import debug from 'debug';
 import helmet from 'helmet';
 
@@ -44,6 +45,7 @@ if (!process.env.DEBUG) {
 app.use(expressWinston.logger(loggerOptions));
 
 routes.push(new UsersRoutes(app));
+routes.push(new AuthRoutes(app));
 
 app.get('/', (req: express.Request, res: express.Response) => {
   res.status(200).send(`Server running at http://localhost:${port}`);

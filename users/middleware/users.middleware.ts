@@ -1,8 +1,6 @@
 import express from 'express';
 import userService from '../services/users.service';
-import debug from 'debug';
 
-const log: debug.IDebugger = debug('app:users-controller');
 class UsersMiddleware {
   async validateRequiredUserBodyFields(
     req: express.Request,
@@ -12,9 +10,9 @@ class UsersMiddleware {
     if (req.body && req.body.email && req.body.password) {
       next();
     } else {
-      res
-        .status(400)
-        .send({ error: `Missing required fields email and password` });
+      res.status(400).send({
+        errors: ['Missing required fields: email and password'],
+      });
     }
   }
 
@@ -25,7 +23,7 @@ class UsersMiddleware {
   ) {
     const user = await userService.getUserByEmail(req.body.email);
     if (user) {
-      res.status(400).send({ error: `User email already exists` });
+      res.status(400).send({ errors: ['User email already exists'] });
     } else {
       next();
     }
@@ -38,21 +36,33 @@ class UsersMiddleware {
   ) {
     const user = await userService.getUserByEmail(req.body.email);
     if (user && user.id === req.params.userId) {
+      res.locals.user = user;
       next();
     } else {
-      res.status(400).send({ error: `Invalid email` });
+      res.status(400).send({ errors: ['Invalid email'] });
     }
   }
 
-  // Here we need to use an arrow function to bind `this` correctly
+  async userCantChangePermission(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    if (res.locals.user.permissionLevel !== req.body.permissionLevel) {
+      res.status(400).send({
+        errors: ['User cannot change permission level'],
+      });
+    } else {
+      next();
+    }
+  }
+
   validatePatchEmail = async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {
     if (req.body.email) {
-      log('Validating email', req.body.email);
-
       this.validateSameEmailBelongToSameUser(req, res, next);
     } else {
       next();
@@ -68,7 +78,9 @@ class UsersMiddleware {
     if (user) {
       next();
     } else {
-      res.status(404).send({ error: `User ${req.params.userId} not found` });
+      res.status(404).send({
+        errors: [`User ${req.params.userId} not found`],
+      });
     }
   }
 
