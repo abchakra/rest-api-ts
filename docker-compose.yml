@@ -1,8 +1,34 @@
 version: "3"
 services:
-  mongo:
+  api:
+    # command: npm run test-dev
+    container_name: my_service
+    build: .
+    volumes:
+      - .:/usr/src/app
+    links:
+      - mongo_db
+    env_file: ./.env
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+      - "5858:5858"
+    environment:
+      - dev=1
+      - db_service_name=my_service_db
+      - db_name=api-db
+      - db_retry_time=3000
+  mongo_db:
+    container_name: my_service_db
     image: mongo
     volumes:
       - ./data:/data/db
+    networks:
+      - backend
     ports:
       - "27017:27017"
+
+networks:
+  backend:
+    driver: bridge
