@@ -1,7 +1,15 @@
+// we import express to add types to the request/response objects from our controller functions
 import express from 'express';
+
+// we import our newly created user services
 import usersService from '../services/users.service';
+
+// we import the argon2 library for password hashing
 import argon2 from 'argon2';
+
+// we use debug with a custom context as described in Part 1
 import debug from 'debug';
+
 import { PatchUserDto } from '../dto/patch.user.dto';
 
 const log: debug.IDebugger = debug('app:users-controller');
